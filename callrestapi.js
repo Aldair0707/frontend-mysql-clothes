@@ -1,4 +1,3 @@
-//var url = "http://localhost:8080/api/clothes";
 var url = "https://mysql-api-clothes.onrender.com/api/clothes";  
 
 function postClothing() {
@@ -8,7 +7,8 @@ function postClothing() {
         color: $('#color').val(),
         size: $('#size').val(),
         description: $('#description').val(),
-        price: $('#price').val()
+        price: $('#price').val(),
+        quantity: $('#quantity').val()
     };
 
     $.ajax({
@@ -41,6 +41,7 @@ function editarClothing(id) {
             $('#size').val(clothing.size);
             $('#description').val(clothing.description);
             $('#price').val(clothing.price);
+            $('#quantity').val(clothing.quantity);
 
             $('#btn-update').show().data('id', id);
             $('#resultado').html("");
@@ -59,7 +60,8 @@ function updateClothing() {
         color: $('#color').val(),
         size: $('#size').val(),
         description: $('#description').val(),
-        price: $('#price').val()
+        price: $('#price').val(),
+        quantity: $('#quantity').val()
     };
 
     $.ajax({
@@ -89,35 +91,35 @@ function getClothingById() {
 
         if (clothing) {
             var html = '<table border="1">' +
-                '<tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Color</th><th>Talla</th><th>Descripción</th><th>Precio</th><th>Acciones</th></tr>' +
+                '<tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Color</th><th>Talla</th><th>Descripción</th><th>Precio</th><th>Cantidad</th><th>Acciones</th></tr>' +
                 '<tr>' +
-                `<td>${clothing.id}</td><td>${clothing.name}</td><td>${clothing.type}</td><td>${clothing.color}</td><td>${clothing.size}</td><td>${clothing.description}</td><td>${clothing.price}</td>` +
-                `<td><button onclick="editarClothing(${clothing.id})">Editar</button> <button onclick="deleteClothing(${clothing.id})">Eliminar</button></td>` +
+                `<td>${clothing.id}</td><td>${clothing.name}</td><td>${clothing.type}</td><td>${clothing.color}</td><td>${clothing.size}</td><td>${clothing.description}</td><td>${clothing.price}</td><td>${clothing.quantity}</td>` + 
+                `<td><button class="editar" onclick="editarClothing(${clothing.id})"><i class="fas fa-pencil-alt"></i> Editar</button> 
+                <button onclick="deleteClothing(${clothing.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></td>` +
                 '</tr>' +
                 '</table>';
             $('#resultado').html(html);
         }
     }).fail(function (jqXHR) {
         if (jqXHR.status === 404) {
-            $('#resultado').html("");
-            mostrarNotificacion(`❌ Prenda con ID ${id} no encontrada.`);
+            $('#resultado').html(""); 
+            mostrarNotificacion(`❌ No se encontró la prenda con ID ${id}.`, 5000);
         } else {
-            mostrarNotificacion(`⚠️ Error al buscar la prenda. Intenta más tarde.`);
+            mostrarNotificacion(`⚠️ Error al buscar la prenda. Intenta más tarde.`, 5000);
             console.error(jqXHR);
         }
     });
-    
 }
 
 function getClothes() {
     $.getJSON(url, function (json) {
         var arr = json.clothes;
         var html = '<table border="1">' +
-            '<tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Color</th><th>Talla</th><th>Descripción</th><th>Precio</th><th>Acciones</th></tr>';
+            '<tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Color</th><th>Talla</th><th>Descripción</th><th>Precio</th><th>Cantidad</th><th>Acciones</th></tr>';
 
         arr.forEach(function (item) {
             html += `<tr>
-                <td>${item.id}</td><td>${item.name}</td><td>${item.type}</td><td>${item.color}</td><td>${item.size}</td><td>${item.description}</td><td>${item.price}</td>
+                <td>${item.id}</td><td>${item.name}</td><td>${item.type}</td><td>${item.color}</td><td>${item.size}</td><td>${item.description}</td><td>${item.price}</td><td>${item.quantity}</td>
                 <td><button onclick="editarClothing(${item.id})">Editar</button> <button onclick="deleteClothing(${item.id})">Eliminar</button></td>
             </tr>`;
         });
@@ -145,7 +147,16 @@ function deleteClothing(id) {
 }
 
 function limpiarInputs() {
-    $('#name, #type, #color, #size, #description, #price, #id-clothing').val('');
+    $('#name, #type, #color, #size, #description, #price, #id-clothing, #quantity').val('');
+}
+
+function mostrarNotificacion(mensaje, duracion = 3000) {
+    const noti = $('#notificacion');
+    noti.text(mensaje).fadeIn();
+
+    setTimeout(() => {
+        noti.fadeOut();
+    }, duracion);
 }
 
 function mostrarNotificacion(mensaje, duracion = 3000) {
